@@ -5,7 +5,7 @@ import uk.ac.bournemouth.ap.lib.matrix.Matrix
 import uk.ac.bournemouth.ap.lib.matrix.SparseMatrix
 import kotlin.random.Random
 
-class StudentDotsBoxGame : AbstractDotsAndBoxesGame() {
+class StudentDotsBoxGame(columns: Int, rows: Int, players: List<Player>) : AbstractDotsAndBoxesGame() {
     override val players: List<Player> = TODO("You will need to get players from your constructor")
 
     override val currentPlayer: Player get()= TODO("Determine the current player, like keeping" +
