@@ -12,16 +12,18 @@ class StudentDotsBoxGame(columns: Int, rows: Int, players: List<Player>) : Abstr
     override val players: List<Player> = players //TODO("You will need to get players from your constructor")
 
     override val currentPlayer: Player get()= HumanPlayer()
-        //TODO("Determine the current player, like keeping" + "the index into the players list")
+    //TODO("Determine the current player, like keeping" + "the index into the players list")
 
     // NOTE: you may want to me more specific in the box type if you use that type in your class
-    override val boxes: Matrix<StudentBox> = MutableMatrix(columns, rows, ::StudentBox) //TODO("Create a matrix initialized with your own box type")
+    override val boxes: Matrix<StudentBox> = MutableMatrix(columns, rows, ::StudentBox)
+    //TODO("Create a matrix initialized with your own box type")
 
-    override val lines: SparseMatrix<StudentLine> = //MutableSparseMatrix(columns, rows, ::StudentLine)
-        TODO("Create a matrix initialized with your own line type")
+    override val lines: SparseMatrix<StudentLine> = MutableMatrix(columns, rows, ::StudentLine)
+    //TODO("Create a matrix initialized with your own line type")
 
     override val isFinished: Boolean
-        get() =  TODO("Provide this getter. Note you can make it a var to do so (with private set)")
+        get() =
+            TODO("Provide this getter. Note you can make it a var to do so (with private set)")
 
     override fun playComputerTurns() {
         var current = currentPlayer
