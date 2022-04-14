@@ -9,21 +9,21 @@ import kotlin.random.Random
 
 
 class StudentDotsBoxGame(columns: Int, rows: Int, players: List<Player>) : AbstractDotsAndBoxesGame() {
-    override val players: List<Player> = players //TODO("You will need to get players from your constructor")
+    override val players: List<Player> = players.toList()
+    //TODO("You will need to get players from your constructor")
 
-    override val currentPlayer: Player get()= HumanPlayer()
+    override var currentPlayer: Player = players[0]
     //TODO("Determine the current player, like keeping" + "the index into the players list")
 
     // NOTE: you may want to me more specific in the box type if you use that type in your class
     override val boxes: Matrix<StudentBox> = MutableMatrix(columns, rows, ::StudentBox)
     //TODO("Create a matrix initialized with your own box type")
 
-    override val lines: SparseMatrix<StudentLine> = MutableMatrix(columns, rows, ::StudentLine)
+    override val lines: SparseMatrix<StudentLine> = MutableMatrix(columns+1, rows*2+1, ::StudentLine)
     //TODO("Create a matrix initialized with your own line type")
 
-    override val isFinished: Boolean
-        get() =
-            TODO("Provide this getter. Note you can make it a var to do so (with private set)")
+    override var isFinished: Boolean = false
+        //TODO("Provide this getter. Note you can make it a var to do so (with private set)")
 
     override fun playComputerTurns() {
         var current = currentPlayer
@@ -45,8 +45,8 @@ class StudentDotsBoxGame(columns: Int, rows: Int, players: List<Player>) : Abstr
 
         override val adjacentBoxes: Pair<StudentBox?, StudentBox?>
             get() {
-//                return boxes[1, 1] to boxes[2,1]
-                TODO("You need to look up the correct boxes for this to work")
+                return boxes[1,1] to boxes[2,1]
+                //TODO("You need to look up the correct boxes for this to work")
             }
 
         override fun drawLine() {
