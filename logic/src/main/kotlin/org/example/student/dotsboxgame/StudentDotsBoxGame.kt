@@ -20,6 +20,7 @@ class StudentDotsBoxGame(columns: Int, rows: Int, players: List<Player>) : Abstr
     //TODO("Create a matrix initialized with your own box type")
 
     override val lines: SparseMatrix<StudentLine> = MutableMatrix(columns+1, rows*2+1, ::StudentLine)
+    //if (rows != rows *2+1 && columns != columns+1) SparseMatrix }
     //TODO("Create a matrix initialized with your own line type")
 
     override var isFinished: Boolean = false
@@ -39,25 +40,47 @@ class StudentDotsBoxGame(columns: Int, rows: Int, players: List<Player>) : Abstr
      * it being an inner class.
      */
     inner class StudentLine(lineX: Int, lineY: Int) : AbstractLine(lineX, lineY) {
-        override val isDrawn: Boolean
-            get() = TODO("Provide this getter. Note you can make it a var to do so")
+        override var isDrawn: Boolean = false
+        //TODO("Provide this getter. Note you can make it a var to do so")
 
 
         override val adjacentBoxes: Pair<StudentBox?, StudentBox?>
             get() {
-                return boxes[1,1] to boxes[2,1]
-                //TODO("You need to look up the correct boxes for this to work")
+                return boxes[1,1] to boxes[1,1] //TODO("You need to look up the correct boxes for this to work")
             }
 
         override fun drawLine() {
-            TODO("Implement the logic for a player drawing a line. Don't forget to inform the listeners (fireGameChange, fireGameOver)")
+
+            var twoTurns = false // checks for both turns to be executed/played
+
+            if (!this.isDrawn) {
+                this.isDrawn = true
+                var finalLine = this
+                for (boxes in adjacentBoxes.toList()) {
+                    if (boxes != null) {
+                        val playerBox = boxes.boundingLines.all { it.isDrawn }
+                        if (playerBox) {
+                            boxes.owningPlayer = currentPlayer
+                            twoTurns = true
+                        }
+                    }
+                }
+            }
+            fireGameChange()
+
+            if (!twoTurns) {
+
+
+            }
+            //TODO("Implement the logic for a player drawing a line. Don't forget to inform the listeners (fireGameChange, fireGameOver)")
             // NOTE read the documentation in the interface, you must also update the current player.
         }
     }
+    // 95004136
 
     inner class StudentBox(boxX: Int, boxY: Int) : AbstractBox(boxX, boxY) {
 
-        override val owningPlayer: Player?
+        override var owningPlayer: Player? = players[0]
             get() = TODO("Provide this getter. Note you can make it a var to do so")
 
         /**
