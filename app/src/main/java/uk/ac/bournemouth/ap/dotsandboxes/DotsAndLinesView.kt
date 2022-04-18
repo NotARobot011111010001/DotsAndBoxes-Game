@@ -6,13 +6,9 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.util.AttributeSet
-import android.view.GestureDetector
-import android.view.MotionEvent
 import android.view.View
-import androidx.core.view.GestureDetectorCompat
 import org.example.student.dotsboxgame.StudentDotsBoxGame
-import uk.ac.bournemouth.ap.dotsandboxeslib.*
-import uk.ac.bournemouth.ap.lib.matrix.MutableMatrix
+import uk.ac.bournemouth.ap.dotsandboxeslib.AbstractDotsAndBoxesGame
 
 
 class DotsAndLinesView: View {
@@ -21,7 +17,10 @@ class DotsAndLinesView: View {
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int)
             : super(context, attrs, defStyleAttr)
 
-    // private val rowCount = get() = ::StudentDotsBoxGame()
+    private val game: AbstractDotsAndBoxesGame = StudentDotsBoxGame(columns, rows, players = );
+
+    private val rows = 10
+    private val columns = 10
 
     // text for players
     private val humanText: String = "Human: "
@@ -48,12 +47,12 @@ class DotsAndLinesView: View {
     private val computerTextColor: Int = Color.RED
 
     /** sets the paint for the background */
-    private val back_paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    private val backPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
         color = backCol
     }
     /** painting the dots */
-    private val dots_paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    private val dotsPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
         //set the paint color using the dots color specified
         color = dotsCol
@@ -67,7 +66,7 @@ class DotsAndLinesView: View {
         //set text properties
         textAlign = Paint.Align.RIGHT
         textSize = 30f * resources.displayMetrics.density
-        typeface = Typeface.MONOSPACE
+        typeface = Typeface.DEFAULT_BOLD
     }
     // painting the Computer Player's font/text
     private val wordsPaintComputer = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -75,7 +74,7 @@ class DotsAndLinesView: View {
         //set text properties
         textAlign = Paint.Align.RIGHT
         textSize = 30f * resources.displayMetrics.density
-        typeface = Typeface.MONOSPACE
+        typeface = Typeface.DEFAULT_BOLD
     }
 
     // Player 1 line color
@@ -90,9 +89,28 @@ class DotsAndLinesView: View {
         color = Color.RED
     }
 
-    //
-    private var xSep: Float = 50f
-    private var ySep: Float = 50f
+    // unknown line color
+    private val unknownLine: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.FILL
+        color = Color.rgb(210,210,210)
+    }
+
+    // dots and Line separating x and y values
+    private var xSep: Float = 100f
+    private var ySep: Float = 100f
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        /*
+        When the amount of the dots changes, this function changes the view
+         */
+        val diameterX = width/(columns + (columns+1)*dotsSpacingRatio)
+        val diameterY = height/(rows + (rows+1)*dotsSpacingRatio)
+
+        dotsDiameter = minOf(diameterX, diameterY)
+        dotsSpacing = dotsDiameter*dotsSpacingRatio
+
+    }
+
 
     override fun onDraw(canvas: Canvas?) {
 
@@ -102,36 +120,40 @@ class DotsAndLinesView: View {
         val canvasHeight = height.toFloat()
 
         // draws a rectangle which fills the whole screen with background color
-        canvas?.drawRect(0f, 0f, canvasWidth, canvasHeight, back_paint)
+        canvas?.drawRect(0f, 0f, canvasWidth, canvasHeight, backPaint)
 
         // Circle
         //get half of the width and height to locate the centre of the screen
         val viewWidthHalf = canvasWidth / 2f
         val viewHeightHalf = canvasHeight / 2f
 
-        // text view height and width
+        // HUMAN text view height and width
         val humanTextViewHeight = viewHeightHalf / 6f
-        val humanTextViewWidth = viewWidthHalf / 1.05f
+        val humanTextViewWidth = viewWidthHalf / 1.25f
 
-        // text view height and width
+        // COMPUTER text view height and width
         val computerTextViewHeight = viewHeightHalf / 4f
-        val computerTextViewWidth = viewWidthHalf / 1.05f
+        val computerTextViewWidth = viewWidthHalf / 1.25f
 
-        //get the radius as half of the width or height, whichever is smaller
-        //subtract twenty so that it has some space around it
-        val radius: Float = minOf(viewWidthHalf,viewHeightHalf) - 20
 
         //canvas?.drawCircle(viewWidthHalf, viewHeightHalf, radius, dots_paint)
         canvas?.drawText(humanText, humanTextViewWidth, humanTextViewHeight, wordsPaintHuman)
         canvas?.drawText(computerText, computerTextViewWidth, computerTextViewHeight, wordsPaintComputer)
 
+        val xDrawRange = 1..columns
+        val yDrawRange = 1..rows
 
         // drawing dots
-
-
-        for (x in 1..10) {
-            for (y in 1..20) {
-                canvas?.drawPoint(x*xSep, y*ySep,  dots_paint)
+        for (x in xDrawRange) {
+            for (y in yDrawRange) {
+                canvas?.drawLine(x*xSep, y*ySep, x*ySep, x*xSep, unknownLine) // vertial lines
+                canvas?.drawLine(x*xSep, y*ySep, y*xSep, y*ySep, unknownLine) // horizontal lines
+                //canvas?.drawPoint(x*xSep, y*ySep, dotsPaint) // dots
+            }
+        }
+        for (x in xDrawRange) {
+            for (y in yDrawRange){
+                canvas?.drawPoint(x*xSep, y*ySep, dotsPaint) // dots
             }
         }
 
