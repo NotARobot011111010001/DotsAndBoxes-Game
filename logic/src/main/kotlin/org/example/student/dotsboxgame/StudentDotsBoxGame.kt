@@ -1,10 +1,8 @@
 package org.example.student.dotsboxgame
 
 import uk.ac.bournemouth.ap.dotsandboxeslib.*
-import uk.ac.bournemouth.ap.lib.matrix.Matrix
-import uk.ac.bournemouth.ap.lib.matrix.SparseMatrix
-import uk.ac.bournemouth.ap.lib.matrix.MutableMatrix
-import uk.ac.bournemouth.ap.lib.matrix.MutableSparseMatrix
+import uk.ac.bournemouth.ap.lib.matrix.*
+import java.lang.Exception
 import kotlin.random.Random
 
 
@@ -19,8 +17,18 @@ class StudentDotsBoxGame(columns: Int, rows: Int, players: List<Player>) : Abstr
     override val boxes: Matrix<StudentBox> = MutableMatrix(columns, rows, ::StudentBox)
     //TODO("Create a matrix initialized with your own box type")
 
-    override val lines: SparseMatrix<StudentLine> = MutableMatrix(columns+1, rows*2+1, ::StudentLine)
-    //if (rows != rows *2+1 && columns != columns+1) SparseMatrix }
+    override val lines: SparseMatrix<StudentLine> = MutableSparseMatrix(columns+1, rows*2+1, { x, y -> x < columns || y % 2 == 1 }, ::StudentLine)
+        //MutableMatrix(columns+1, rows*2+1, ::StudentLine)
+    /* {
+        if (rows > rows  && columns > columns) throw Exception()}
+
+        /* if (StudentLine(columns, rows).pos.x > rows && (StudentLine(columns, rows).pos.y > columns))
+            throw Exception("There is no line")
+        else
+            return@MutableMatrix*/
+    }
+    if (rows != rows *2+1 && columns != columns+1) throw Exception()}
+*/
     //TODO("Create a matrix initialized with your own line type")
 
     override var isFinished: Boolean = false
@@ -46,7 +54,7 @@ class StudentDotsBoxGame(columns: Int, rows: Int, players: List<Player>) : Abstr
 
         override val adjacentBoxes: Pair<StudentBox?, StudentBox?>
             get() {
-                return boxes[1,1] to boxes[1,1] //TODO("You need to look up the correct boxes for this to work")
+                return boxes[0,0] to boxes[0,4] //TODO("You need to look up the correct boxes for this to work")
             }
 
         override fun drawLine() {
@@ -54,6 +62,7 @@ class StudentDotsBoxGame(columns: Int, rows: Int, players: List<Player>) : Abstr
             var twoTurns = false // checks for both turns to be executed/played
 
             if (!this.isDrawn) {
+                currentPlayer = players[0]
                 this.isDrawn = true
                 var finalLine = this
                 for (boxes in adjacentBoxes.toList()) {
@@ -69,25 +78,34 @@ class StudentDotsBoxGame(columns: Int, rows: Int, players: List<Player>) : Abstr
             fireGameChange()
 
             if (!twoTurns) {
-
-
+                currentPlayer = players[1]
+                playComputerTurns()
+                this.isDrawn = true
+                for (boxes in adjacentBoxes.toList()) {
+                    if (boxes != null) {
+                        val computerBox = boxes.boundingLines.all { it.isDrawn }
+                        if (computerBox) {
+                            boxes.owningPlayer = currentPlayer
+                            //twoTurns = true
+                        }
+                    }
+                }
             }
             //TODO("Implement the logic for a player drawing a line. Don't forget to inform the listeners (fireGameChange, fireGameOver)")
             // NOTE read the documentation in the interface, you must also update the current player.
         }
     }
-    // 95004136
 
     inner class StudentBox(boxX: Int, boxY: Int) : AbstractBox(boxX, boxY) {
-
-        override var owningPlayer: Player? = players[0]
-            get() = TODO("Provide this getter. Note you can make it a var to do so")
+        override var owningPlayer: Player? = null //players[0] ** this will change as the game progresses
+        //TODO("Provide this getter. Note you can make it a var to do so")
 
         /**
          * This must be lazy or a getter, otherwise there is a chicken/egg problem with the boxes
          */
         override val boundingLines: Iterable<DotsAndBoxesGame.Line>
-            get() = TODO("Look up the correct lines from the game outer class")
+            get() = lines
+        // TODO("Look up the correct lines from the game outer class")
 
     }
 }

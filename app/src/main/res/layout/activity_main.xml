@@ -10,9 +10,10 @@
         android:id="@+id/button"
         android:layout_width="128dp"
         android:layout_height="43dp"
-        android:layout_marginTop="108dp"
-        android:text="Restart Game"
+        android:layout_marginTop="560dp"
+        android:text="@string/restart_game"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/dotsAndLinesView"
         tools:ignore="MissingConstraints" />

@@ -6,9 +6,15 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.util.AttributeSet
+import android.view.GestureDetector
+import android.view.MotionEvent
 import android.view.View
+import androidx.core.view.GestureDetectorCompat
 import org.example.student.dotsboxgame.StudentDotsBoxGame
 import uk.ac.bournemouth.ap.dotsandboxeslib.AbstractDotsAndBoxesGame
+import uk.ac.bournemouth.ap.dotsandboxeslib.ComputerPlayer
+import uk.ac.bournemouth.ap.dotsandboxeslib.HumanPlayer
+import uk.ac.bournemouth.ap.dotsandboxeslib.Player
 
 
 class DotsAndLinesView: View {
@@ -17,10 +23,8 @@ class DotsAndLinesView: View {
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int)
             : super(context, attrs, defStyleAttr)
 
-    private val game: AbstractDotsAndBoxesGame = StudentDotsBoxGame(columns, rows, players = );
-
-    private val rows = 10
-    private val columns = 10
+    private var rows = 10
+    private var columns = 10
 
     // text for players
     private val humanText: String = "Human: "
@@ -38,7 +42,7 @@ class DotsAndLinesView: View {
     private val dotsCol: Int = Color.rgb(153,153,153)
 
     /** background color */
-    private val backCol: Int = Color.rgb(222,222,222)
+    private val backCol: Int = Color.rgb(230,230,230)
 
     /** Human player's text color - matches the line color  */
     private val humanTextCol: Int = Color.BLUE
@@ -94,10 +98,19 @@ class DotsAndLinesView: View {
         style = Paint.Style.FILL
         color = Color.rgb(210,210,210)
     }
+    /* private val unknownLine2: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.FILL
+        //color = Color.RED
+        color = Color.rgb(220,220,220)
+    }*/
 
     // dots and Line separating x and y values
     private var xSep: Float = 100f
     private var ySep: Float = 100f
+
+    val game: StudentDotsBoxGame = StudentDotsBoxGame(columns,rows, players = listOf(HumanPlayer(),
+        HumanPlayer()
+    ))
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         /*
@@ -108,7 +121,6 @@ class DotsAndLinesView: View {
 
         dotsDiameter = minOf(diameterX, diameterY)
         dotsSpacing = dotsDiameter*dotsSpacingRatio
-
     }
 
 
@@ -128,11 +140,11 @@ class DotsAndLinesView: View {
         val viewHeightHalf = canvasHeight / 2f
 
         // HUMAN text view height and width
-        val humanTextViewHeight = viewHeightHalf / 6f
+        val humanTextViewHeight = viewHeightHalf / 0.8f
         val humanTextViewWidth = viewWidthHalf / 1.25f
 
         // COMPUTER text view height and width
-        val computerTextViewHeight = viewHeightHalf / 4f
+        val computerTextViewHeight = viewHeightHalf / 0.75f
         val computerTextViewWidth = viewWidthHalf / 1.25f
 
 
@@ -143,22 +155,57 @@ class DotsAndLinesView: View {
         val xDrawRange = 1..columns
         val yDrawRange = 1..rows
 
-        // drawing dots
-        for (x in xDrawRange) {
-            for (y in yDrawRange) {
-                canvas?.drawLine(x*xSep, y*ySep, x*ySep, x*xSep, unknownLine) // vertial lines
-                canvas?.drawLine(x*xSep, y*ySep, y*xSep, y*ySep, unknownLine) // horizontal lines
-                //canvas?.drawPoint(x*xSep, y*ySep, dotsPaint) // dots
-            }
-        }
-        for (x in xDrawRange) {
-            for (y in yDrawRange){
-                canvas?.drawPoint(x*xSep, y*ySep, dotsPaint) // dots
+        val radius = dotsDiameter / 2f
+
+        // drawing vertical lines
+        for (col in xDrawRange) {
+            for (row in yDrawRange) {
+                canvas?.drawLine(row*xSep, col*ySep, row*ySep, row*xSep, unknownLine) // vertical lines
             }
         }
 
+        // drawing horizontal lines
+        for (col in xDrawRange) {
+            for (row in yDrawRange) {
+                canvas?.drawLine(row*xSep, col*ySep, col*ySep, col*ySep, unknownLine) // horizontal lines
+            }
+        }
+
+        // drawing dots
+        for (col in xDrawRange) { // for loop is separated from above because dots are drawn above the lines
+            for (row in yDrawRange){
+                canvas?.drawPoint(col*xSep, row*ySep, dotsPaint) // dots
+            }
+        }
+
+        val scores = game.getScores().contentToString()
+
+
         super.onDraw(canvas)
     }
+    private val gestureDetector = GestureDetectorCompat(context, object:
+        GestureDetector.SimpleOnGestureListener() {
+
+        override fun onDown(e: MotionEvent): Boolean {
+            return true
+        }
+
+        override fun onSingleTapConfirmed(e: MotionEvent?): Boolean {
+            val lineTouched = ((e?.x?.minus(dotsSpacing * 0.5f))?.div((dotsSpacing + dotsDiameter)))?.toInt()
+
+            if (lineTouched in 0 until columns) {
+                game.lines
+                invalidate()
+                return true
+            } else {
+                return false
+            }
+
+
+        }
+
+
+    })
 
 
 
