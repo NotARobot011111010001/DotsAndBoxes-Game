@@ -177,6 +177,7 @@ class DotsAndLinesView: View {
                 canvas?.drawPoint(col*xSep, row*ySep, dotsPaint) // dots
             }
         }
+        
 
         val scores = game.getScores().contentToString()
 
