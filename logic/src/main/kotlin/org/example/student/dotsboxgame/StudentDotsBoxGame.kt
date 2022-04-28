@@ -5,7 +5,7 @@ import uk.ac.bournemouth.ap.lib.matrix.*
 import kotlin.random.Random
 
 
-class StudentDotsBoxGame(columns: Int, rows: Int, players: List<Player>) : AbstractDotsAndBoxesGame() {
+class StudentDotsBoxGame(val columns: Int, val rows: Int, players: List<Player>) : AbstractDotsAndBoxesGame() {
     override val players: List<Player> = players.toList()
     //TODO("You will need to get players from your constructor")
 
@@ -43,8 +43,38 @@ class StudentDotsBoxGame(columns: Int, rows: Int, players: List<Player>) : Abstr
 
         override val adjacentBoxes: Pair<StudentBox?, StudentBox?>
             get() {
-                return boxes[0,0] to boxes[0,0]
-//                return boxes[0,3] to boxes[0,4]
+                //return boxes[0,0] to boxes[0,0]
+
+                if (lineX == 0 && lineY % 2 ==1) {
+                    val boxLeft = null
+                    val boxRight = boxes[lineX, lineY / 2]
+                    return Pair(boxLeft,boxRight)
+                }
+                else if (lineY == 0) {
+                    val boxLeft = null
+                    val boxRight = boxes[lineX, lineY]
+                    return Pair(boxLeft, boxRight)
+                }
+                else if (lineX == columns) {
+                    val boxLeft = boxes[lineX - 1, lineY / 2]
+                    val boxRight = null
+                    return Pair(boxLeft, boxRight)
+                }
+                else if (lineY == rows * 2) {
+                    val boxLeft = boxes[lineX, lineY / 2 - 1]
+                    val boxRight = null
+                    return Pair(boxLeft, boxRight)
+                }
+                else if (lineY % 2 == 1) {
+                    val boxLeft = boxes[lineX - 1, lineY / 2]
+                    val boxRight = boxes[lineX, lineY / 2]
+                    return Pair(boxLeft, boxRight)
+                }
+                else {
+                    val boxLeft = boxes[lineX, lineY - (lineY / 2 + 1)]
+                    val boxRight = boxes[lineX, lineY - (lineY / 2)]
+                    return Pair(boxLeft, boxRight)
+                }
                 // TODO("You need to look up the correct boxes for this to work")
             }
 
@@ -65,7 +95,6 @@ class StudentDotsBoxGame(columns: Int, rows: Int, players: List<Player>) : Abstr
                         }
                     }
                 }
-                //throw Exception("Cannot draw on already drawn line")
             }
             fireGameChange()
 

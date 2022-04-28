@@ -23,15 +23,16 @@ class DotsAndLinesView: View {
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int)
             : super(context, attrs, defStyleAttr)
 
-    private var rows = 10
-    private var columns = 10
+    val game: StudentDotsBoxGame = StudentDotsBoxGame(10,10, players = listOf(HumanPlayer(),
+        HumanPlayer()
+    ))
+
+    val rows = game.rows
+    val columns = game.columns
 
     // text for players
     private val humanText: String = "Human: "
     private val computerText: String = "Computer: "
-
-    // scores count
-    //private var humanScores: Int = getScores()
 
     // Dots size and spacing
     private var dotsDiameter: Float = 0f
@@ -86,41 +87,30 @@ class DotsAndLinesView: View {
         style = Paint.Style.FILL
         color = Color.BLUE
     }
-
     // ComputerPlayer line color
     private val computerLine: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
         color = Color.RED
     }
-
     // unknown line color
     private val unknownLine: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
         color = Color.rgb(210,210,210)
     }
-    /* private val unknownLine2: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.FILL
-        //color = Color.RED
-        color = Color.rgb(220,220,220)
-    }*/
 
     // dots and Line separating x and y values
     private var xSep: Float = 100f
     private var ySep: Float = 100f
 
-    val game: StudentDotsBoxGame = StudentDotsBoxGame(columns,rows, players = listOf(HumanPlayer(),
-        HumanPlayer()
-    ))
-
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         /*
         When the amount of the dots changes, this function changes the view
          */
-        val diameterX = width/(columns + (columns+1)*dotsSpacingRatio)
-        val diameterY = height/(rows + (rows+1)*dotsSpacingRatio)
+        val diameterX = width / (columns + (columns+1) * dotsSpacingRatio)
+        val diameterY = height / (rows + (rows+1) * dotsSpacingRatio)
 
         dotsDiameter = minOf(diameterX, diameterY)
-        dotsSpacing = dotsDiameter*dotsSpacingRatio
+        dotsSpacing = dotsDiameter * dotsSpacingRatio
     }
 
 
@@ -134,7 +124,7 @@ class DotsAndLinesView: View {
         // draws a rectangle which fills the whole screen with background color
         canvas?.drawRect(0f, 0f, canvasWidth, canvasHeight, backPaint)
 
-        // Circle
+
         //get half of the width and height to locate the centre of the screen
         val viewWidthHalf = canvasWidth / 2f
         val viewHeightHalf = canvasHeight / 2f
@@ -151,6 +141,13 @@ class DotsAndLinesView: View {
         //canvas?.drawCircle(viewWidthHalf, viewHeightHalf, radius, dots_paint)
         canvas?.drawText(humanText, humanTextViewWidth, humanTextViewHeight, wordsPaintHuman)
         canvas?.drawText(computerText, computerTextViewWidth, computerTextViewHeight, wordsPaintComputer)
+
+        val scoreHuman = game.getScores()[0].toString() // human player score
+        val scoreComputer = game.getScores()[1].toString() // Computer player score
+
+        canvas?.drawText(scoreHuman, humanTextViewWidth * 1.1f, humanTextViewHeight, wordsPaintHuman)
+        canvas?.drawText(scoreComputer, computerTextViewWidth * 1.1f, computerTextViewHeight, wordsPaintComputer)
+
 
         val xDrawRange = 1..columns
         val yDrawRange = 1..rows
@@ -177,13 +174,10 @@ class DotsAndLinesView: View {
                 canvas?.drawPoint(col*xSep, row*ySep, dotsPaint) // dots
             }
         }
-        
-
-        val scores = game.getScores().contentToString()
-
 
         super.onDraw(canvas)
     }
+
     private val gestureDetector = GestureDetectorCompat(context, object:
         GestureDetector.SimpleOnGestureListener() {
 
@@ -201,8 +195,6 @@ class DotsAndLinesView: View {
             } else {
                 return false
             }
-
-
         }
 
 
