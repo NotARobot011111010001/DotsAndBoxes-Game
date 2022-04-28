@@ -105,7 +105,6 @@ class StudentDotsBoxGame(val columns: Int, val rows: Int, players: List<Player>)
                 getScores()
             }
 
-
             if (!twoTurns) {
                 currentPlayer = players[1]
                 playComputerTurns()

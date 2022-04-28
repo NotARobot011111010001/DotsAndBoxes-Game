@@ -1,15 +1,20 @@
 package uk.ac.bournemouth.ap.dotsandboxes
 
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
+import android.os.Build
 import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
+import android.widget.Button
+import androidx.core.content.ContextCompat.getDrawable
 import androidx.core.view.GestureDetectorCompat
+import com.google.android.material.snackbar.Snackbar
 import org.example.student.dotsboxgame.StudentDotsBoxGame
 import uk.ac.bournemouth.ap.dotsandboxeslib.AbstractDotsAndBoxesGame
 import uk.ac.bournemouth.ap.dotsandboxeslib.ComputerPlayer
@@ -106,15 +111,18 @@ class DotsAndLinesView: View {
         /*
         When the amount of the dots changes, this function changes the view
          */
-        val diameterX = width / (columns + (columns+1) * dotsSpacingRatio)
-        val diameterY = height / (rows + (rows+1) * dotsSpacingRatio)
+        val diameterX = width / (columns + (columns + 1) * dotsSpacingRatio)
+        val diameterY = height / (rows + (rows + 1) * dotsSpacingRatio)
 
         dotsDiameter = minOf(diameterX, diameterY)
         dotsSpacing = dotsDiameter * dotsSpacingRatio
     }
 
+    val  restartButton = findViewById<Button>(R.id.RestartButton)
 
-    override fun onDraw(canvas: Canvas?) {
+    // val restartimgae = getDrawable(R.drawable.ic_sharp_restart_24)
+
+    override fun onDraw(canvas: Canvas) {
 
         // Background
         // Measure the size of the canvas, we could take into account padding here
@@ -122,7 +130,7 @@ class DotsAndLinesView: View {
         val canvasHeight = height.toFloat()
 
         // draws a rectangle which fills the whole screen with background color
-        canvas?.drawRect(0f, 0f, canvasWidth, canvasHeight, backPaint)
+        canvas.drawRect(0f, 0f, canvasWidth, canvasHeight, backPaint)
 
 
         //get half of the width and height to locate the centre of the screen
@@ -138,15 +146,15 @@ class DotsAndLinesView: View {
         val computerTextViewWidth = viewWidthHalf / 1.25f
 
 
-        //canvas?.drawCircle(viewWidthHalf, viewHeightHalf, radius, dots_paint)
-        canvas?.drawText(humanText, humanTextViewWidth, humanTextViewHeight, wordsPaintHuman)
-        canvas?.drawText(computerText, computerTextViewWidth, computerTextViewHeight, wordsPaintComputer)
+        //canvas.drawCircle(viewWidthHalf, viewHeightHalf, radius, dots_paint)
+        canvas.drawText(humanText, humanTextViewWidth, humanTextViewHeight, wordsPaintHuman)
+        canvas.drawText(computerText, computerTextViewWidth, computerTextViewHeight, wordsPaintComputer)
 
         val scoreHuman = game.getScores()[0].toString() // human player score
         val scoreComputer = game.getScores()[1].toString() // Computer player score
 
-        canvas?.drawText(scoreHuman, humanTextViewWidth * 1.1f, humanTextViewHeight, wordsPaintHuman)
-        canvas?.drawText(scoreComputer, computerTextViewWidth * 1.1f, computerTextViewHeight, wordsPaintComputer)
+        canvas.drawText(scoreHuman, humanTextViewWidth * 1.1f, humanTextViewHeight, wordsPaintHuman)
+        canvas.drawText(scoreComputer, computerTextViewWidth * 1.1f, computerTextViewHeight, wordsPaintComputer)
 
 
         val xDrawRange = 1..columns
@@ -157,21 +165,21 @@ class DotsAndLinesView: View {
         // drawing vertical lines
         for (col in xDrawRange) {
             for (row in yDrawRange) {
-                canvas?.drawLine(row*xSep, col*ySep, row*ySep, row*xSep, unknownLine) // vertical lines
+                canvas.drawLine(row*xSep, col*ySep, row*ySep, row*xSep, unknownLine) // vertical lines
             }
         }
 
         // drawing horizontal lines
         for (col in xDrawRange) {
             for (row in yDrawRange) {
-                canvas?.drawLine(row*xSep, col*ySep, col*ySep, col*ySep, unknownLine) // horizontal lines
+                canvas.drawLine(row*xSep, col*ySep, col*ySep, col*ySep, unknownLine) // horizontal lines
             }
         }
 
         // drawing dots
         for (col in xDrawRange) { // for loop is separated from above because dots are drawn above the lines
             for (row in yDrawRange){
-                canvas?.drawPoint(col*xSep, row*ySep, dotsPaint) // dots
+                canvas.drawPoint(col*xSep, row*ySep, dotsPaint) // dots
             }
         }
 
@@ -185,10 +193,11 @@ class DotsAndLinesView: View {
             return true
         }
 
-        override fun onSingleTapConfirmed(e: MotionEvent?): Boolean {
-            val lineTouched = ((e?.x?.minus(dotsSpacing * 0.5f))?.div((dotsSpacing + dotsDiameter)))?.toInt()
+        override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+            val lineTouched = ((e.x - dotsSpacing * 0.5f) / (dotsSpacing + dotsDiameter)).toInt()
 
             if (lineTouched in 0 until columns) {
+                //Snackbar
                 game.lines
                 invalidate()
                 return true
@@ -196,8 +205,6 @@ class DotsAndLinesView: View {
                 return false
             }
         }
-
-
     })
 
 
