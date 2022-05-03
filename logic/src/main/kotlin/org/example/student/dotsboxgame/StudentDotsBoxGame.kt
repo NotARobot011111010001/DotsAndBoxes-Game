@@ -83,7 +83,6 @@ class StudentDotsBoxGame(val columns: Int, val rows: Int, players: List<Player>)
             var twoTurns = false // checks for both turns to be executed/played
 
             if (!this.isDrawn) {
-                //currentPlayer = players[0]
                 this.isDrawn = true
                 var finalLine = this
                 for (boxes in adjacentBoxes.toList()) {
@@ -98,11 +97,12 @@ class StudentDotsBoxGame(val columns: Int, val rows: Int, players: List<Player>)
             }
             fireGameChange()
 
-            var ganeOverFlag = boxes.all { it.owningPlayer != null } // checks if all boxes owned
+            var gameOverFlag = boxes.all { it.owningPlayer != null } // checks if all boxes owned
 
-            if (ganeOverFlag) {
-                isFinished = true
+            if (gameOverFlag) {
+                isFinished =true
                 getScores()
+                //fireGameOver()
             }
 
             if (!twoTurns) {
@@ -115,18 +115,20 @@ class StudentDotsBoxGame(val columns: Int, val rows: Int, players: List<Player>)
                         val computerBox = boxes.boundingLines.all { it.isDrawn }
                         if (computerBox) {
                             boxes.owningPlayer = currentPlayer
-                            //twoTurns = true
                         }
                     }
                 }
             }
+            fireGameChange()
             if (this.isDrawn) {
+                //currentPlayer
                 for (boxes in adjacentBoxes.toList()) {
-                    if (boxes != null ) {
-
+                    if (boxes != null) {
+                        val LinesDrawn = boxes.boundingLines.all { it.isDrawn }
                     }
                 }
             }
+
             //TODO("Implement the logic for a player drawing a line. Don't forget to inform the listeners (fireGameChange, fireGameOver)")
             // NOTE read the documentation in the interface, you must also update the current player.
         }
@@ -140,7 +142,13 @@ class StudentDotsBoxGame(val columns: Int, val rows: Int, players: List<Player>)
          * This must be lazy or a getter, otherwise there is a chicken/egg problem with the boxes
          */
         override val boundingLines: Iterable<DotsAndBoxesGame.Line>
-            get() = lines //.filter { it.isDrawn }
-        // TODO("Look up the correct lines from the game outer class")
+            get() = listOf(lines[boxX, (boxY*2)],
+                lines[boxX+1, (boxY*2) +1],
+                lines[boxX, (boxY+1)*2],
+                lines[boxX, (boxY*2) +1])
+
+
+    //lines //.filter { it.isDrawn }
+        //TODO("Look up the correct lines from the game outer class")
     }
 }

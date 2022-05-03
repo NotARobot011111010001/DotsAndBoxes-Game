@@ -28,9 +28,7 @@ class DotsAndLinesView: View {
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int)
             : super(context, attrs, defStyleAttr)
 
-    val game: StudentDotsBoxGame = StudentDotsBoxGame(10,10, players = listOf(HumanPlayer(),
-        HumanPlayer()
-    ))
+    val game: StudentDotsBoxGame = StudentDotsBoxGame(10,10, players = listOf(HumanPlayer(), HumanPlayer()))
 
     val rows = game.rows
     val columns = game.columns
@@ -61,7 +59,7 @@ class DotsAndLinesView: View {
         style = Paint.Style.FILL
         color = backCol
     }
-    /** painting the dots */
+    /** sets the paint for dots */
     private val dotsPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
         //set the paint color using the dots color specified
@@ -70,7 +68,7 @@ class DotsAndLinesView: View {
         setStrokeWidth(15f)
         setStrokeCap(Paint.Cap.ROUND)
     }
-    // painting the Human player's font/text
+    // painting the Human player's font/text and setting text properties
     private val wordsPaintHuman = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = humanTextCol
         //set text properties
@@ -78,7 +76,7 @@ class DotsAndLinesView: View {
         textSize = 30f * resources.displayMetrics.density
         typeface = Typeface.DEFAULT_BOLD
     }
-    // painting the Computer Player's font/text
+    // painting the Computer Player's font/text and setting text properties
     private val wordsPaintComputer = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = computerTextColor
         //set text properties
@@ -138,13 +136,19 @@ class DotsAndLinesView: View {
         val viewHeightHalf = canvasHeight / 2f
 
         // HUMAN text view height and width
-        val humanTextViewHeight = viewHeightHalf / 0.8f
+        val humanTextViewHeight = viewHeightHalf / 0.7f
         val humanTextViewWidth = viewWidthHalf / 1.25f
 
         // COMPUTER text view height and width
         val computerTextViewHeight = viewHeightHalf / 0.75f
         val computerTextViewWidth = viewWidthHalf / 1.25f
 
+        /** sets the color of line according to the current player */
+        val paint  = when (game.players) {
+            game.players[0] -> player1Line
+            game.players[1] -> computerLine
+            else -> unknownLine
+        }
 
         //canvas.drawCircle(viewWidthHalf, viewHeightHalf, radius, dots_paint)
         canvas.drawText(humanText, humanTextViewWidth, humanTextViewHeight, wordsPaintHuman)
@@ -160,19 +164,19 @@ class DotsAndLinesView: View {
         val xDrawRange = 1..columns
         val yDrawRange = 1..rows
 
-        val radius = dotsDiameter / 2f
+        //val radius = dotsDiameter / 2f
 
         // drawing vertical lines
         for (col in xDrawRange) {
             for (row in yDrawRange) {
-                canvas.drawLine(row*xSep, col*ySep, row*ySep, row*xSep, unknownLine) // vertical lines
+                canvas.drawLine(row*xSep, col*ySep, row*ySep, row*xSep, paint) // vertical lines
             }
         }
 
         // drawing horizontal lines
         for (col in xDrawRange) {
             for (row in yDrawRange) {
-                canvas.drawLine(row*xSep, col*ySep, col*ySep, col*ySep, unknownLine) // horizontal lines
+                canvas.drawLine(row*xSep, col*ySep, col*ySep, col*ySep, paint) // horizontal lines
             }
         }
 
@@ -182,7 +186,6 @@ class DotsAndLinesView: View {
                 canvas.drawPoint(col*xSep, row*ySep, dotsPaint) // dots
             }
         }
-
         super.onDraw(canvas)
     }
 
@@ -194,20 +197,31 @@ class DotsAndLinesView: View {
         }
 
         override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-            val lineTouched = ((e.x - dotsSpacing * 0.5f) / (dotsSpacing + dotsDiameter)).toInt()
+            val colTouched = ((e.x - (dotsSpacing + 1.5f)) / (dotsSpacing + dotsDiameter)).toInt()
 
-            if (lineTouched in 0 until columns) {
-                //Snackbar
-                game.lines
-                invalidate()
-                return true
+            val rowTouched = ((e.y - dotsSpacing + 1.5f) / (dotsSpacing + dotsDiameter)).toInt()
+
+            val xDrawRange = 0..columns
+            val yDrawRange = 0..rows
+
+            return if (colTouched in xDrawRange) {//0 until xDrawRange) {
+                if (rowTouched in yDrawRange) {//0 until rows) {
+                    game.StudentLine(rowTouched, colTouched)
+                    Snackbar
+                        .make(this@DotsAndLinesView, "Line drawn in column " + (colTouched +1).toString() + " and in row " + (rowTouched +1).toString(), Snackbar.LENGTH_LONG).show()
+                    invalidate()
+                    true
+                } else {
+                    false
+                }
             } else {
-                return false
+                false
             }
         }
-    })
 
+})
 
-
-
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        return gestureDetector.onTouchEvent(event) || super.onTouchEvent(event)
+    }
 }
