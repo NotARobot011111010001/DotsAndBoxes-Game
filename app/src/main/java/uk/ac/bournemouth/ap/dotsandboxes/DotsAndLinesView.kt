@@ -265,13 +265,7 @@ open class DotsAndLinesView: View {
                             game.StudentLine(lineToDraw.lineX, lineToDraw.lineY).drawLine()
                             Snackbar
                                 .make(this@DotsAndLinesView, "Line to draw in column " + (lineToDraw.lineX + 1).toString() + " and in rows " + (lineToDraw.lineY).toString(), Snackbar.LENGTH_SHORT).show()
-
                         }
-                        //game.StudentLine(lineToDraw.lineX, lineToDraw.lineY).drawLine()
-                        //Snackbar
-                        //    .make(this@DotsAndLinesView, "Line drawn in column " + (colTouched +1).toString() + " and in rows " + (rowTouched).toString(), Snackbar.LENGTH_SHORT).show()
-                        //Snackbar
-                        //    .make(this@DotsAndLinesView, "Line to draw in column " + (lineToDraw.lineX + 1).toString() + " and in rows " + (lineToDraw.lineY).toString(), Snackbar.LENGTH_SHORT).show()
                         true
                     } else {
                         false
